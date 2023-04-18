@@ -16,33 +16,31 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { gotchi } from "../../.dfx/local/canisters/gotchi";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useBalance, useWallet, useTransfer } from "@connect2ic/react";
 
 export default function Gotchis({ stateChanger, ...rest }) {
+  const [wallet] = useWallet();
+  const [assets] = useBalance();
   const [gotchis, setGotchis] = React.useState();
   const [load, setLoad] = useState(false);
   const backgroundColor = useColorModeValue('white', 'gray.800');
 
-  const stats = {
-    posts: 100,
-    followers: 1782,
-    following: 404,
-  };
-
   useEffect(() => {
     (async () => {
-      const tokens = await gotchi.getGotchis();
-      setTimeout(() => {
-        setGotchis(tokens);
-        setLoad(true);
-      }, 100);
+      setTimeout(async () => {
+        let principal_id = wallet.principal;
+        const tokens = await gotchi.getGotchisFromUser(principal_id);
+        setTimeout(() => {
+          setGotchis(tokens);
+          setLoad(true);
+        }, 100);
+      }, 1000);
     })();
   }, []);
 
-
-
   async function sleepGotchi(id) {
     const sleep = await gotchi.sleep(parseInt(id));
-    if(sleep.Ok.message !== ""){
+    if (sleep.Ok.message !== "") {
       toast(sleep.Ok.message);
     }
     setTimeout(async () => {
@@ -56,7 +54,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
 
   async function playGotchi(id) {
     const play = await gotchi.play(parseInt(id));
-    if(play.Ok.message !== ""){
+    if (play.Ok.message !== "") {
       toast(play.Ok.message);
     }
     setTimeout(async () => {
@@ -72,7 +70,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
 
   async function feedGotchi(id) {
     const feed = await gotchi.feed(parseInt(id));
-    if(feed.Ok.message !== ""){
+    if (feed.Ok.message !== "") {
       toast(feed.Ok.message);
     }
     setTimeout(async () => {
@@ -132,7 +130,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                   </Box>
                   <br />
                   {(gotchi.metadata.properties.lastMeal > 0) && <Box d="flex" alignItems="baseline">
-                    <b>Última comida:</b> {getDate(gotchi.metadata.properties.lastMeal)}
+                    <b>Last meal:</b> {getDate(gotchi.metadata.properties.lastMeal)}
                   </Box>}
                   <br />
                   <HStack w="100%" justify="space-evenly">
@@ -142,7 +140,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                       align="center"
                       direction="column">
                       <Text casing="capitalize" fontWeight="bold">
-                        Salud
+                        Health
                       </Text>
                       <Text>{gotchi.metadata.properties.health.toString()}</Text>
                     </Flex>
@@ -152,7 +150,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                       align="center"
                       direction="column">
                       <Text casing="capitalize" fontWeight="bold">
-                        Hambre
+                        Hunger
                       </Text>
                       <Text>{gotchi.metadata.properties.hunger.toString()}</Text>
                     </Flex>
@@ -162,7 +160,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                       align="center"
                       direction="column">
                       <Text casing="capitalize" fontWeight="bold">
-                        Sueño
+                        Dream
                       </Text>
                       <Text>{gotchi.metadata.properties.sleep.toString()}</Text>
                     </Flex>
@@ -172,7 +170,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                       align="center"
                       direction="column">
                       <Text casing="capitalize" fontWeight="bold">
-                        Felicidad
+                        Happiness
                       </Text>
                       <Text>{gotchi.metadata.properties.happiness.toString()}</Text>
                     </Flex>
@@ -189,7 +187,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                         type='submit'
                         onClick={async () => { playGotchi(gotchi.id); }}
                       >
-                        Jugar
+                        Play
                       </Button>
                     </Flex>
                     <Flex
@@ -203,7 +201,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                         type='submit'
                         onClick={async () => { feedGotchi(gotchi.id); }}
                       >
-                        Comer
+                        Feed
                       </Button>
                     </Flex>
                     <Flex
@@ -217,7 +215,7 @@ export default function Gotchis({ stateChanger, ...rest }) {
                         type='submit'
                         onClick={async () => { sleepGotchi(gotchi.id); }}
                       >
-                        Dormir
+                        Sleep
                       </Button>
                     </Flex>
                   </HStack>

@@ -40,21 +40,21 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
       spect : Text = spect;
       name : Text = name;
       icon : Text = icon;
-      symbol : Text = symbol;
+      symbol : Text = symbol
     };
 
-    return meta;
+    return meta
   };
 
   public query func getTransactionId() : async Types.TransactionId {
-    return transactionId;
+    return transactionId
   };
 
   // Get gotchis Number
   public query func totalSupplyGotchis() : async Nat64 {
     return Nat64.fromNat(
-      List.size(nfts),
-    );
+      List.size(nfts)
+    )
   };
 
   // Get One Gotchi
@@ -62,18 +62,29 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     let item = List.find(nfts, func(token : Types.Nft) : Bool { token.id == token_id });
     switch (item) {
       case null {
-        return #Err(#InvalidTokenId);
+        return #Err(#InvalidTokenId)
       };
       case (?token) {
-        return #Ok(token.metadata);
-      };
-    };
+        return #Ok(token.metadata)
+      }
+    }
+  };
+
+  // Get All Gotchis From User
+  public query func getGotchisFromUser(user : Text) : async [Types.Nft] {
+    let items = List.filter(
+      nfts,
+      func(token : Types.Nft) : Bool {
+        return token.owner == Principal.fromText(user);
+      },
+    );
+
+    return List.toArray(items);
   };
 
   // Get All Gotchis
-  public query func getGotchis() : async [Types.Nft] {
+  public query func getAll() : async [Types.Nft] {
     let items = List.filter(nfts, func(token : Types.Nft) : Bool { true });
-
     return List.toArray(items);
   };
 
@@ -85,9 +96,9 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     let timestamp = Time.now();
     let n = timestamp / 1000;
     let burritoImg : Text = if (n % 2 == 0) {
-      burrito1;
+      burrito1
     } else {
-      burrito2;
+      burrito2
     };
 
     let newId = Nat64.fromNat(List.size(nfts));
@@ -97,7 +108,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
       hunger = 0;
       sleep = 0;
       happiness = 10;
-      lastMeal = Time.now();
+      lastMeal = Time.now()
     };
 
     let meta : Types.TokenMetadata = {
@@ -105,13 +116,13 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
       description : Text = metadata.description;
       image : Text = burritoImg;
       external_url : Text = "";
-      properties : Types.Properties = properties;
+      properties : Types.Properties = properties
     };
 
     let nft : Types.Nft = {
       owner = Principal.fromText(to);
       id = newId;
-      metadata = meta;
+      metadata = meta
     };
 
     nfts := List.push(nft, nfts);
@@ -121,8 +132,8 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     return #Ok({
       token_id = newId;
       id = transactionId;
-      message = "Gotchi Minado con éxito";
-    });
+      message = "Gotchi Minado con éxito"
+    })
   };
 
   // +-happiness | +sleep | -health
@@ -131,7 +142,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     let actualDate = Time.now();
     switch (item) {
       case null {
-        return #Err(#InvalidTokenId);
+        return #Err(#InvalidTokenId)
       };
       case (?token) {
         // Consultar última vez que comio el gotchi
@@ -144,124 +155,132 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
         // 1 minuto:   60000000000
 
         // 1 día sin comer
-        if (actualDate >= (token.metadata.properties.lastMeal+60000000000) and actualDate < (token.metadata.properties.lastMeal+120000000000)) {
+        if (actualDate >= (token.metadata.properties.lastMeal +60000000000) and actualDate < (token.metadata.properties.lastMeal +120000000000)) {
           transactionId += 1;
           nfts := List.map(
             nfts,
             func(item : Types.Nft) : Types.Nft {
               if (item.id == token.id) {
-                let new_happiness = token.metadata.properties.happiness-1;
-                let happiness = if (new_happiness < 0) { 0 } else { new_happiness };
+                let new_happiness = token.metadata.properties.happiness -1;
+                let happiness = if (new_happiness < 0) { 0 } else {
+                  new_happiness
+                };
                 let properties : Types.Properties = {
                   health = token.metadata.properties.health;
-                  hunger = if (token.metadata.properties.hunger > 1) { token.metadata.properties.hunger } else { 1 };
+                  hunger = if (token.metadata.properties.hunger > 1) {
+                    token.metadata.properties.hunger
+                  } else { 1 };
                   sleep = token.metadata.properties.sleep;
                   happiness = happiness;
-                  lastMeal = token.metadata.properties.lastMeal;
+                  lastMeal = token.metadata.properties.lastMeal
                 };
                 let new_meta : Types.TokenMetadata = {
                   name : Text = token.metadata.name;
                   description : Text = token.metadata.description;
                   image : Text = token.metadata.image;
                   external_url : Text = token.metadata.external_url;
-                  properties : Types.Properties = properties;
+                  properties : Types.Properties = properties
                 };
                 let update : Types.Nft = {
                   owner = item.owner;
                   id = item.id;
-                  metadata = new_meta;
+                  metadata = new_meta
                 };
-                return update;
+                return update
               } else {
-                return item;
-              };
+                return item
+              }
             },
           );
           return #Ok({
             token_id = token.id;
             id = transactionId;
-            message = "Tu Gotchi lleva 1 día sin comer";
-          });
+            message = "Your Gotchi hasn't eaten for 1 day"
+          })
         };
         // 2 días sin comer
-        if (actualDate >= (token.metadata.properties.lastMeal+120000000000) and actualDate < (token.metadata.properties.lastMeal+180000000000)) {
+        if (actualDate >= (token.metadata.properties.lastMeal +120000000000) and actualDate < (token.metadata.properties.lastMeal +180000000000)) {
           transactionId += 1;
           nfts := List.map(
             nfts,
             func(item : Types.Nft) : Types.Nft {
               if (item.id == token.id) {
-                let new_happiness = token.metadata.properties.happiness-1;
-                let happiness = if (new_happiness < 0) { 0 } else { new_happiness };
+                let new_happiness = token.metadata.properties.happiness -1;
+                let happiness = if (new_happiness < 0) { 0 } else {
+                  new_happiness
+                };
                 let properties : Types.Properties = {
                   health = token.metadata.properties.health;
                   hunger = 2;
                   sleep = token.metadata.properties.sleep;
                   happiness = happiness;
-                  lastMeal = token.metadata.properties.lastMeal;
+                  lastMeal = token.metadata.properties.lastMeal
                 };
                 let new_meta : Types.TokenMetadata = {
                   name : Text = token.metadata.name;
                   description : Text = token.metadata.description;
                   image : Text = token.metadata.image;
                   external_url : Text = token.metadata.external_url;
-                  properties : Types.Properties = properties;
+                  properties : Types.Properties = properties
                 };
                 let update : Types.Nft = {
                   owner = item.owner;
                   id = item.id;
-                  metadata = new_meta;
+                  metadata = new_meta
                 };
-                return update;
+                return update
               } else {
-                return item;
-              };
+                return item
+              }
             },
           );
           return #Ok({
             token_id = token.id;
             id = transactionId;
-            message = "Tu Gotchi lleva 2 días sin comer";
-          });
+            message = "Your Gotchi hasn't eaten for 2 days"
+          })
         };
         // Mas de 3 días sin comer
-        if (actualDate >= (token.metadata.properties.lastMeal+180000000000)) {
+        if (actualDate >= (token.metadata.properties.lastMeal +180000000000)) {
           transactionId += 1;
           nfts := List.map(
             nfts,
             func(item : Types.Nft) : Types.Nft {
               if (item.id == token.id) {
-                let new_happiness = token.metadata.properties.happiness-1;
-                let happiness = if (new_happiness < 0) { 0 } else { new_happiness };
+                let new_happiness = token.metadata.properties.happiness -1;
+                let happiness = if (new_happiness < 0) { 0 } else {
+                  new_happiness
+                };
                 let properties : Types.Properties = {
                   health = token.metadata.properties.health;
                   hunger = 3;
                   sleep = token.metadata.properties.sleep;
                   happiness = happiness;
-                  lastMeal = token.metadata.properties.lastMeal;
+                  lastMeal = token.metadata.properties.lastMeal
                 };
                 let new_meta : Types.TokenMetadata = {
                   name : Text = token.metadata.name;
                   description : Text = token.metadata.description;
                   image : Text = token.metadata.image;
                   external_url : Text = token.metadata.external_url;
-                  properties : Types.Properties = properties;
+                  properties : Types.Properties = properties
                 };
                 let update : Types.Nft = {
                   owner = item.owner;
                   id = item.id;
-                  metadata = new_meta;
+                  metadata = new_meta
                 };
-                return update;
+                return update
               } else {
-                return item;
-              };
+                return item
+              }
             },
           );
           return #Ok({
             token_id = token.id;
             id = transactionId;
-            message = "Tu Gotchi lleva 3 días sin comer";
-          });
+            message = "Your Gotchi hasn't eaten for 3 days"
+          })
         };
 
         // Modificar estadísticas
@@ -272,28 +291,28 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
 
               let new_happiness = token.metadata.properties.happiness +1;
               let happiness = if (new_happiness > 10) { 10 } else {
-                new_happiness;
+                new_happiness
               };
-              
 
               let timestamp = Time.now();
               let n = timestamp / 1000;
               let gaveSleep : Bool = if (n % 2 == 0) {
-                true;
+                true
               } else {
-                false;
+                false
               };
 
-              let new_sleep = if (gaveSleep) { token.metadata.properties.sleep +1 } else { token.metadata.properties.sleep };
+              let new_sleep = if (gaveSleep) {
+                token.metadata.properties.sleep +1
+              } else { token.metadata.properties.sleep };
               let sleep = if (new_sleep > 10) { 10 } else { new_sleep };
-              
 
               let properties : Types.Properties = {
                 health = token.metadata.properties.health;
                 hunger = token.metadata.properties.hunger;
                 sleep = sleep;
                 happiness = happiness;
-                lastMeal = token.metadata.properties.lastMeal;
+                lastMeal = token.metadata.properties.lastMeal
               };
 
               let new_meta : Types.TokenMetadata = {
@@ -301,27 +320,27 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
                 description : Text = token.metadata.description;
                 image : Text = token.metadata.image;
                 external_url : Text = token.metadata.external_url;
-                properties : Types.Properties = properties;
+                properties : Types.Properties = properties
               };
               let update : Types.Nft = {
                 owner = item.owner;
                 id = item.id;
-                metadata = new_meta;
+                metadata = new_meta
               };
-              return update;
+              return update
             } else {
-              return item;
-            };
+              return item
+            }
           },
         );
         transactionId += 1;
         return #Ok({
           token_id = token.id;
           id = transactionId;
-          message = "Tu Gotchi a jugado";
-        });
-      };
-    };
+          message = "Your Gotchi has played"
+        })
+      }
+    }
   };
 
   // -sleep
@@ -329,7 +348,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     let item = List.find(nfts, func(token : Types.Nft) : Bool { token.id == token_id });
     switch (item) {
       case null {
-        return #Err(#InvalidTokenId);
+        return #Err(#InvalidTokenId)
       };
       case (?token) {
         nfts := List.map(
@@ -337,7 +356,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
           func(item : Types.Nft) : Types.Nft {
             if (item.id == token.id) {
               let new_health = if (token.metadata.properties.sleep == 0) {
-                token.metadata.properties.health -1;
+                token.metadata.properties.health -1
               } else { token.metadata.properties.health };
               let health = if (new_health < 0) { 0 } else { new_health };
               let new_sleep = token.metadata.properties.sleep -1;
@@ -347,7 +366,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
                 hunger = token.metadata.properties.hunger;
                 sleep = sleep;
                 happiness = token.metadata.properties.happiness;
-                lastMeal = token.metadata.properties.lastMeal;
+                lastMeal = token.metadata.properties.lastMeal
               };
 
               let new_meta : Types.TokenMetadata = {
@@ -355,27 +374,27 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
                 description : Text = token.metadata.description;
                 image : Text = token.metadata.image;
                 external_url : Text = token.metadata.external_url;
-                properties : Types.Properties = properties;
+                properties : Types.Properties = properties
               };
               let update : Types.Nft = {
                 owner = item.owner;
                 id = item.id;
-                metadata = new_meta;
+                metadata = new_meta
               };
-              return update;
+              return update
             } else {
-              return item;
-            };
+              return item
+            }
           },
         );
         transactionId += 1;
         return #Ok({
           token_id = token.id;
           id = transactionId;
-          message = "Tu Gotchi a descansado";
-        });
-      };
-    };
+          message = "Your Gotchi has rested"
+        })
+      }
+    }
   };
 
   // -hunger
@@ -383,7 +402,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     let item = List.find(nfts, func(token : Types.Nft) : Bool { token.id == token_id });
     switch (item) {
       case null {
-        return #Err(#InvalidTokenId);
+        return #Err(#InvalidTokenId)
       };
       case (?token) {
         // Modificar estadísticas
@@ -399,7 +418,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
                 hunger = hunger;
                 sleep = token.metadata.properties.sleep;
                 happiness = token.metadata.properties.happiness;
-                lastMeal = Time.now();
+                lastMeal = Time.now()
               };
 
               let new_meta : Types.TokenMetadata = {
@@ -407,26 +426,26 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
                 description : Text = token.metadata.description;
                 image : Text = token.metadata.image;
                 external_url : Text = token.metadata.external_url;
-                properties : Types.Properties = properties;
+                properties : Types.Properties = properties
               };
               let update : Types.Nft = {
                 owner = item.owner;
                 id = item.id;
-                metadata = new_meta;
+                metadata = new_meta
               };
-              return update;
+              return update
             } else {
-              return item;
-            };
+              return item
+            }
           },
         );
         transactionId += 1;
         return #Ok({
           token_id = token.id;
           id = transactionId;
-          message = "Tu Gotchi a comido";
-        });
-      };
-    };
-  };
-};
+          message = "Your Gotchi has eaten"
+        })
+      }
+    }
+  }
+}

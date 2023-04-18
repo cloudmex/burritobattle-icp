@@ -34,9 +34,8 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from '@chakra-ui/icons';
-import { ConnectButton, ConnectDialog, Connect2ICProvider } from "@connect2ic/react";
+import { useBalance, useWallet, ConnectButton, ConnectDialog, Connect2ICProvider } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
-import { useBalance, useWallet } from "@connect2ic/react";
 import logo from "../assets/dfinity.svg";
 
 export default function WithSubnavigation({ stateChanger, ...rest }) {
@@ -101,7 +100,7 @@ export default function WithSubnavigation({ stateChanger, ...rest }) {
                         color: linkHoverColor,
                         bg: popoverContentBgColor
                       }}>
-                      Minar
+                      Mint
                     </Link>
                   </PopoverTrigger>
                 </Popover>
@@ -110,7 +109,65 @@ export default function WithSubnavigation({ stateChanger, ...rest }) {
           </Flex>
         </Flex>
 
-        {wallet ? (
+        <Flex alignItems={'center'}>
+          <Stack direction={'row'} spacing={7}>
+            <Button onClick={toggleColorMode}>
+              {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            </Button>
+
+            <Menu>
+              <MenuButton
+                as={Button}
+                rounded={'full'}
+                variant={'link'}
+                cursor={'pointer'}
+                minW={0}>
+                <Avatar
+                  name={"A"}
+                  src={logo}
+                  size={'sm'}
+                  width={'auto'}
+                />
+              </MenuButton>
+              <MenuList alignItems={'center'}>
+                <br />
+                <Center>
+                  <Avatar
+                    size={'sm'}
+                    name={"A"}
+                    src={logo}
+                    width={'auto'}
+                  />
+                </Center>
+                <br />
+                <Center>
+                  <Grid templateColumns='repeat(1, 1fr)' gap={6}>
+                    <GridItem w='100%' h='10'>
+                      <p>Wallet address: <span style={{ fontSize: "0.7em" }}>{wallet ? (wallet.principal.substring(0, 5) + ".." + wallet.principal.substring(wallet.principal.length - 3, wallet.principal.length)) : "-"} </span></p><br />
+                    </GridItem>
+                    {assets && assets.map(asset => (
+                      <GridItem w='100%' key={asset.canisterId}>
+                        {asset.name}: {asset.amount}
+                      </GridItem>
+                    ))}
+                  </Grid>
+                </Center>
+                <br />
+                <MenuDivider />
+                <Center>
+                  <ConnectButton
+                    dark={false}
+                    onDisconnect={() => { window.location.reload() }}
+                  />
+                </Center>
+              </MenuList>
+            </Menu>
+          </Stack>
+        </Flex>
+
+
+
+        {/* { wallet ? (
           <>
             <Flex alignItems={'center'}>
               <Stack direction={'row'} spacing={7}>
@@ -158,7 +215,10 @@ export default function WithSubnavigation({ stateChanger, ...rest }) {
                     <br />
                     <MenuDivider />
                     <Center>
-                      <ConnectButton dark={false} />
+                      <ConnectButton 
+                        dark={false} 
+                        onDisconnect={() => {window.location.reload()}}
+                      />
                     </Center>
                   </MenuList>
                 </Menu>
@@ -166,8 +226,10 @@ export default function WithSubnavigation({ stateChanger, ...rest }) {
             </Flex>
           </>
         ) : (
-          <ConnectButton />
-        )}
+          <ConnectButton 
+            dark={false} 
+          />
+        )} */}
       </Flex>
     </Box>
   );

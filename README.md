@@ -1,20 +1,35 @@
-## ICP Gotchi
+## Burrito Battle - ICP 🐴
 
-Correr instancia DFX
+Burrito Battle is a full ecosystem of adventures for Burritos, A decentralized game living on Blockchain.
+We started at NEAR and now we are looking for more ways to expand the Burrito culture.
 
-dfx start --clean
+Internet Computer Protocol is a blockchain network that aims to bring greater efficiency, speed and decentralization to computation and data storage.
 
-Desplegar contrato
+BurritoBattle-ICP is an initiative to develop a gaming platform based on blockchain technology and the ICP protocol. The platform will allow users to create, collect and care for their own Tamagotchis (virtual pets) in a secure and decentralized environment.
 
-  dfx deploy --argument "(
-    principal\"$(dfx identity get-principal)\", 
-    record {
-      spect = \"nft-1.0.0\";
-      name = \"BurritoBattle Tamagotchi\";
-      icon = \"icon\";
-      symbol = \"BBT\";
-    }
-  )" --no-wallet
+## Install dependencies 📦
+
+    npm install
+
+### Register, build, and deploy the application 🚀
+
+Run DFX instance
+    
+    dfx start --clean
+
+Local
+
+    dfx deploy --argument "(
+      principal\"$(dfx identity get-principal)\", 
+      record {
+        spect = \"nft-1.0.0\";
+        name = \"BurritoBattle Tamagotchi\";
+        icon = \"icon\";
+        symbol = \"BBT\";
+      }
+    )" --no-wallet
+
+Mainnet
 
   dfx deploy --network ic --argument "(
     principal\"$(dfx identity get-principal)\", 
@@ -26,9 +41,9 @@ Desplegar contrato
     }
   )"
 
-Minar token
+### Mint
 
-  dfx canister call gotchi_backend mintGotchi \
+ dfx canister call gotchi_backend mintGotchi \
   "(
     \"$(dfx identity get-principal)\", 
     record {
@@ -37,22 +52,16 @@ Minar token
     }
   )"
 
-Consultar token
+### Interact with the virtual pet
 
-  dfx canister call gotchi_backend getMetadataGotchi "(1)"
-
-Consultar transactionId
-
-  dfx canister call gotchi_backend getTransactionId
-
-Jugar
+Play
 
   dfx canister call gotchi_backend play "(0)"
 
-Alimentar
+Feed
 
   dfx canister call gotchi_backend feed "(0)"
 
-Dormir
+Sleep
 
   dfx canister call gotchi_backend sleep "(0)"

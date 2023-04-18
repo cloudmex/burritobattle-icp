@@ -11,6 +11,7 @@ import {
   ChakraProvider,
   theme
 } from '@chakra-ui/react';
+import { PlugWallet } from "@connect2ic/core/providers/plug-wallet"
 
 /*
  * Connect2ic provides essential utilities for IC app development
@@ -43,6 +44,7 @@ function App() {
   if (view != "gotchi" && view != "gotchis" && view != "mint") {
     return (
       <ChakraProvider theme={theme}>
+        <ConnectDialog />
         <Center>
           <>
             <div style={{ width: '100%' }}>
@@ -67,7 +69,7 @@ function App() {
                     color="primary.800"
                     textAlign={["center", "center", "left", "left"]}
                   >
-                    ICP Gotchi
+                    Burrito Battle - ICP
                   </Heading>
                   <Heading
                     as="h2"
@@ -78,9 +80,13 @@ function App() {
                     lineHeight={1.5}
                     textAlign={["center", "center", "left", "left"]}
                   >
-                    Para consusltar los gotchis creados y minar nuevos, de clic en siguiente.
+                    To mint and interact with your virtual pets, connect your ICP account.
                   </Heading>
-                  <Button
+                  <ConnectButton 
+                    dark={false} 
+                    onConnect={() => {gotchis();}}
+                  />
+                  {/* <Button
                     bg='tomato'
                     colorScheme="primary"
                     borderRadius="8px"
@@ -91,7 +97,7 @@ function App() {
                     onClick={async () => { gotchis(); }}
                   >
                     Siguiente
-                  </Button>
+                  </Button> */}
                 </Stack>
                 <Box w={{ base: "80%", sm: "60%", md: "50%" }} mb={{ base: 12, md: 0 }}>
                   <Image src={"https://images.alphacoders.com/112/thumb-1920-1129289.jpg"} size="100%" rounded="1rem" shadow="2xl" mx="auto" />
@@ -143,17 +149,20 @@ function App() {
 }
 
 const client = createClient({
+  providers: [
+    new PlugWallet(),
+  ],
   canisters: {
     gotchi,
   },
-  providers: defaultProviders,
-  globalProviderConfig: {
-    /*
-     * Disables dev mode in production
-     * Should be enabled when using local canisters
-     */
-    dev: import.meta.env.DEV,
-  },
+  //providers: defaultProviders,
+  // globalProviderConfig: {
+  //   /*
+  //    * Disables dev mode in production
+  //    * Should be enabled when using local canisters
+  //    */
+  //   dev: import.meta.env.DEV,
+  // },
 })
 
 export default () => (

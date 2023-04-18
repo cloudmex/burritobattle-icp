@@ -50,15 +50,15 @@ export default function Mint({ stateChanger, ...rest }) {
         };
 
         const new_token = await gotchi.mintGotchi(principal_id, metadata);
-        toast("Gotchi minado con éxito");
+        toast("Gotchi successfully minted");
         setTimeout(() => {
           stateChanger('gotchis');
         }, 1000);
 
       } else {
-        toast("No tienes fondos suficientes");
+        toast("You don't have enough funds");
       }
-    }, 1000);
+    }, 2000);
   }
 
   return (
@@ -78,20 +78,20 @@ export default function Mint({ stateChanger, ...rest }) {
         />
         <Grid>
           <FormControl>
-            <FormLabel><b>Nombre</b></FormLabel>
+            <FormLabel><b>Name</b></FormLabel>
             <Input type='text' value={name} onChange={handleNameChange} />
           </FormControl><br></br>
-          <FormControl>
+          {/* <FormControl>
             <FormLabel><b>Descripción</b></FormLabel>
             <Input type='text' value={description} onChange={handleDescriptionChange} />
-          </FormControl><br></br>
+          </FormControl><br></br> */}
           <Button
             mt={4}
             colorScheme='teal'
             type='submit'
             onClick={async () => { mintGotchi(); }}
           >
-            Minar
+            Mint
           </Button>
         </Grid>
       </>
