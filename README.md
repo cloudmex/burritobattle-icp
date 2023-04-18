@@ -9,7 +9,9 @@ BurritoBattle-ICP is an initiative to develop a gaming platform based on blockch
 
 ## Install dependencies 📦
 
+    [Node.js] ≥ 12.22.5 
     npm install
+    npm install vite --save
 
 ### Register, build, and deploy the application 🚀
 
