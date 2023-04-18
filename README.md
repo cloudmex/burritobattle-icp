@@ -33,15 +33,15 @@ Local
 
 Mainnet
 
-  dfx deploy --network ic --argument "(
-    principal\"$(dfx identity get-principal)\", 
-    record {
-      spect = \"nft-1.0.0\";
-      name = \"BurritoBattle Tamagotchi\";
-      icon = \"icon\";
-      symbol = \"BBT\";
-    }
-  )"
+    dfx deploy --network ic --argument "(
+      principal\"$(dfx identity get-principal)\", 
+      record {
+        spect = \"nft-1.0.0\";
+        name = \"BurritoBattle Tamagotchi\";
+        icon = \"icon\";
+        symbol = \"BBT\";
+      }
+    )"
 
 ### Mint
 

@@ -34,5 +34,11 @@
       "type": "persistent"
     }
   },
+  "dependencies": {
+    "base": {
+      "git": "https://github.com/dfinity/motoko-base.git",
+      "branch": "master"
+    }
+  },
   "version": 1
 }

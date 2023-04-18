@@ -19,12 +19,13 @@ import Blob "mo:base/Blob";
 import Char "mo:base/Char";
 
 shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMetadata) = Self {
-  stable var transactionId : Types.TransactionId = 0;
-  stable var nfts = List.nil<Types.Nft>();
-  stable var custodians = List.make<Principal>(custodian);
+  stable var transactionId : Types.TransactionId = 0; // Transaction counter
+  stable var nfts = List.nil<Types.Nft>(); // List where nfts are stored
+  stable var custodians = List.make<Principal>(custodian); // List where the custodians of the contract are stored
   stable var spect : Text = init.spect;
   stable var name : Text = init.name;
 
+  //Burrito's designs
   stable var burrito1 : Text = "https://cloudflare-ipfs.com/ipfs/QmbMS3P3gn2yivKDFvHSxYjVZEZrBdxyZtnnnJ62tVuSVk";
   stable var burrito2 : Text = "https://cloudflare-ipfs.com/ipfs/QmQcTRnmdFhWa1j47JZAxr5CT1Cdr5AfqdhnrGpSdr28t6";
   stable var burrito3 : Text = "https://cloudflare-ipfs.com/ipfs/QmULzZNvTGrRxEMvFVYPf1qaBc4tQtz6c3MVGgRNx36gAq";
@@ -35,6 +36,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
   let null_address : Principal = Principal.fromText("aaaaa-aa");
   let my_address : Principal = Principal.fromText("442hv-ighve-2goce-5z4ct-2gs32-u7rwj-kjusx-3tfgn-sjerk-mrx2a-tqe");
 
+  // Get NFT Contract Metadata
   public query func getNFTContractMetadata() : async Types.NFTContractMetadata {
     let meta : Types.NFTContractMetadata = {
       spect : Text = spect;
@@ -46,6 +48,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     return meta
   };
 
+  // Get last transaction number
   public query func getTransactionId() : async Types.TransactionId {
     return transactionId
   };
@@ -59,7 +62,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
 
   // Get One Gotchi
   public query func getMetadataGotchi(token_id : Types.TokenId) : async Types.MetadataResult {
-    let item = List.find(nfts, func(token : Types.Nft) : Bool { token.id == token_id });
+    let item = List.find(nfts, func(token : Types.Nft) : Bool { token.id == token_id }); // Find NFT by Id
     switch (item) {
       case null {
         return #Err(#InvalidTokenId)
@@ -75,7 +78,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     let items = List.filter(
       nfts,
       func(token : Types.Nft) : Bool {
-        return token.owner == Principal.fromText(user);
+        return token.owner == Principal.fromText(user); // Filter NFT's by user
       },
     );
 
@@ -90,9 +93,10 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
 
   // Mint
   public shared ({ caller }) func mintGotchi(to : Text, metadata : Types.TokenMetadataParameters) : async Types.MintReceipt {
-    // if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == caller })) {
+    // if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == caller })) { // Only custodians can mint
     //   return #Err(#Unauthorized);
     // };
+
     let timestamp = Time.now();
     let n = timestamp / 1000;
     let burritoImg : Text = if (n % 2 == 0) {
@@ -132,7 +136,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
     return #Ok({
       token_id = newId;
       id = transactionId;
-      message = "Gotchi Minado con éxito"
+      message = "Gotchi Minted successfully"
     })
   };
 
@@ -145,16 +149,15 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
         return #Err(#InvalidTokenId)
       };
       case (?token) {
-        // Consultar última vez que comio el gotchi
-        // 3 dia:  259200000000000
-        // 2 dia:  172800000000000
-        // 1 dia:   86400000000000
-        // 1 hora:   3600000000000
-        // 3 minutos: 180000000000
-        // 2 minutos: 120000000000
-        // 1 minuto:   60000000000
+        // 3 days:  259200000000000
+        // 2 days:  172800000000000
+        // 1 day:   86400000000000
+        // 1 hour:   3600000000000
+        // 3 minutes: 180000000000
+        // 2 minutes: 120000000000
+        // 1 minute:   60000000000
 
-        // 1 día sin comer
+        // 1 day without eating
         if (actualDate >= (token.metadata.properties.lastMeal +60000000000) and actualDate < (token.metadata.properties.lastMeal +120000000000)) {
           transactionId += 1;
           nfts := List.map(
@@ -198,7 +201,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
             message = "Your Gotchi hasn't eaten for 1 day"
           })
         };
-        // 2 días sin comer
+        // 2 days without eating
         if (actualDate >= (token.metadata.properties.lastMeal +120000000000) and actualDate < (token.metadata.properties.lastMeal +180000000000)) {
           transactionId += 1;
           nfts := List.map(
@@ -240,7 +243,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
             message = "Your Gotchi hasn't eaten for 2 days"
           })
         };
-        // Mas de 3 días sin comer
+        // 3 days without eating
         if (actualDate >= (token.metadata.properties.lastMeal +180000000000)) {
           transactionId += 1;
           nfts := List.map(
@@ -283,7 +286,7 @@ shared actor class ICPGotchi(custodian : Principal, init : Types.NFTContractMeta
           })
         };
 
-        // Modificar estadísticas
+        // Modify statistics
         nfts := List.map(
           nfts,
           func(item : Types.Nft) : Types.Nft {
