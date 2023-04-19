@@ -44,7 +44,9 @@ export default function Gotchis({ stateChanger, ...rest }) {
       toast(sleep.Ok.message);
     }
     setTimeout(async () => {
-      const tokens = await gotchi.getGotchis();
+      let principal_id = wallet.principal;
+      const tokens = await gotchi.getGotchisFromUser(principal_id);
+
       setTimeout(() => {
         setGotchis(tokens);
         setLoad(true);
@@ -58,7 +60,9 @@ export default function Gotchis({ stateChanger, ...rest }) {
       toast(play.Ok.message);
     }
     setTimeout(async () => {
-      const tokens = await gotchi.getGotchis();
+      let principal_id = wallet.principal;
+      const tokens = await gotchi.getGotchisFromUser(principal_id);
+
       setTimeout(async () => {
 
         setGotchis(tokens);
@@ -74,7 +78,9 @@ export default function Gotchis({ stateChanger, ...rest }) {
       toast(feed.Ok.message);
     }
     setTimeout(async () => {
-      const tokens = await gotchi.getGotchis();
+      let principal_id = wallet.principal;
+      const tokens = await gotchi.getGotchisFromUser(principal_id);
+
       setTimeout(() => {
         setGotchis(tokens);
         setLoad(true);
